@@ -1,0 +1,80 @@
+name: On pull request
+
+on: pull_request
+
+jobs:
+  housekeeping:
+    name: Housekeeping
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@master
+      - name: Add labels
+        uses: adamzolyak/monorepo-pr-labeler-action@patching
+        env:
+          BASE_DIRS: src|plugins
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Set status
+        uses: wip/action@master
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  typecheck:
+    name: Typecheck
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@master
+      - uses: actions/setup-node@master
+        with:
+          node-version: 12.x
+      - run: npm install -g yarn
+      - run: yarn install
+      - name: Typecheck
+        run: yarn tsc
+
+  run_tests:
+    name: Tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@master
+      - uses: actions/setup-node@master
+        with:
+          node-version: 12.x
+      - run: npm install -g yarn
+      - run: yarn install
+      - name: Tests
+        run: yarn test:ci --coverage
+      - name: Upload to codecov
+        uses: codecov/codecov-action@v1
+
+  lint:
+    name: Lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@master
+      - uses: actions/setup-node@master
+        with:
+          node-version: 12.x
+      - run: npm install -g yarn
+      - run: yarn install
+      - name: Lint
+        run: yarn lint:ci
+
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@master
+      - uses: actions/setup-node@master
+        with:
+          node-version: 12.x
+      - run: npm install -g yarn
+      - run: yarn install --frozen-lockfile
+      - name: Build
+        run: yarn build
+      - uses: paularmstrong/build-tracker-action@master
+        with:
+          BT_CLI_CONFIG: ./demo/build-tracker-cli.config.js
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          BT_API_AUTH_TOKEN: ${{ secrets.BT_API_AUTH_TOKEN }}
+          BT_FILTER_TABLE_ROWS: true
+          BT_FAIL_ON_ERROR: false

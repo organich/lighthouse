@@ -1,0 +1,25 @@
+{
+  "name": "@build-tracker/api-errors",
+  "version": "1.0.0",
+  "description": "Build Tracker API errors",
+  "author": "Paul Armstrong <paul@spaceyak.com>",
+  "repository": "git@github.com:paularmstrong/build-tracker.git",
+  "license": "MIT",
+  "main": "dist",
+  "module": "./",
+  "types": "dist/index.d.ts",
+  "sideEffects": false,
+  "files": [
+    "index.js",
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "clean": "rimraf dist",
+    "tsc": "tsc --noEmit"
+  },
+  "gitHead": "156788a6a199fc25e21adf354c106defd002afbf",
+  "publishConfig": {
+    "access": "public"
+  }
+}

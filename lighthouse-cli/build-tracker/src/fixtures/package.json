@@ -1,0 +1,17 @@
+{
+  "name": "@build-tracker/fixtures",
+  "version": "1.0.0",
+  "description": "Build Tracker build fixtures",
+  "author": "Paul Armstrong <paul@spaceyak.com>",
+  "repository": "git@github.com:paularmstrong/build-tracker.git",
+  "license": "MIT",
+  "main": "./",
+  "module": "./",
+  "dependencies": {
+    "glob": "^7.1.3"
+  },
+  "gitHead": "156788a6a199fc25e21adf354c106defd002afbf",
+  "publishConfig": {
+    "access": "public"
+  }
+}

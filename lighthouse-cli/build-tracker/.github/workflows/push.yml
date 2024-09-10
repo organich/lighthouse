@@ -1,0 +1,60 @@
+name: On push
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  run_tests:
+    name: Typecheck, Test, Lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@master
+      - uses: actions/setup-node@master
+        with:
+          node-version: 12.x
+      - run: npm install -g yarn
+      - run: yarn install
+      - name: Typecheck
+        run: yarn tsc
+      - name: Tests
+        run: yarn test:ci --coverage
+      - name: Lint
+        run: yarn lint:ci
+      - uses: codecov/codecov-action@v1
+
+  upload-build:
+    name: Upload build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@master
+      - uses: actions/setup-node@master
+        with:
+          node-version: 12.x
+      - run: npm install -g yarn
+      - run: yarn install
+      - name: Build all
+        run: yarn build
+      - name: Upload build
+        run: yarn ts-node src/cli/src/bin.ts upload-build -c demo/build-tracker-cli.config.js -b main
+        env:
+          BT_API_AUTH_TOKEN: ${{ secrets.BT_API_AUTH_TOKEN }}
+
+  deploy:
+    name: Deploy docs
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@master
+      - uses: actions/setup-node@master
+        with:
+          node-version: 12.x
+      - run: npm install -g yarn
+      - run: yarn install
+      - name: Build docs
+        run: yarn workspace @build-tracker/docs build
+      - name: Deploy documentation
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./docs/build

@@ -1,0 +1,64 @@
+name: bandersnatch_docker_upload
+
+on:
+  push:
+    branches:
+      - main
+  release:
+    types: created
+
+jobs:
+  docker:
+    runs-on: ubuntu-latest
+    if: github.repository == 'pypa/bandersnatch'
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Login to DockerHub
+        uses: docker/login-action@v3.3.0
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Check + set version tag
+        run:
+          echo "GIT_TAG=$(git describe --candidates=0 --tags 2> /dev/null || echo
+          latest_non_release)" >> $GITHUB_ENV
+
+      - name: Build and push filesystem image
+        uses: docker/build-push-action@v6
+        env:
+          PY_VERSION: '3.12'
+        with:
+          build-args: PY_VERSION
+          context: .
+          platforms: linux/amd64,linux/arm64
+          push: true
+          tags: pypa/bandersnatch:latest,pypa/bandersnatch:${{ env.GIT_TAG }},pypa/bandersnatch:3,pypa/bandersnatch:3.12
+
+      - name: Filesystem Image digest
+        run: echo ${{ steps.docker_build.outputs.digest }}
+
+      - name: Build and push s3 image
+        uses: docker/build-push-action@v6
+        env:
+          PY_VERSION: '3.12'
+          WITH_S3: yes
+        with:
+          build-args: |
+            PY_VERSION
+            WITH_S3
+          context: .
+          platforms: linux/amd64,linux/arm64
+          push: true
+          tags: pypa/bandersnatch:s3-latest,pypa/bandersnatch:s3-${{ env.GIT_TAG }},pypa/bandersnatch:s3-3,pypa/bandersnatch:s3-3.12
+
+      - name: S3 Image digest
+        run: echo ${{ steps.docker_build.outputs.digest }}

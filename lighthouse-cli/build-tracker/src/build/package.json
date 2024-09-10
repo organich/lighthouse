@@ -1,0 +1,26 @@
+{
+  "name": "@build-tracker/build",
+  "version": "1.0.0",
+  "description": "Build Tracker tools for interacting with individual Builds",
+  "author": "Paul Armstrong <paul@spaceyak.com>",
+  "repository": "git@github.com:paularmstrong/build-tracker.git",
+  "license": "MIT",
+  "main": "dist",
+  "module": "./",
+  "types": "dist/index.d.ts",
+  "sideEffects": false,
+  "files": [
+    "index.js",
+    "dist"
+  ],
+  "scripts": {
+    "@build-tracker/types": "^1.0.0-beta.12",
+    "build": "tsc",
+    "clean": "rimraf dist",
+    "tsc": "tsc --noEmit"
+  },
+  "gitHead": "156788a6a199fc25e21adf354c106defd002afbf",
+  "publishConfig": {
+    "access": "public"
+  }
+}
